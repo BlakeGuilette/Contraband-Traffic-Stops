@@ -1,0 +1,33 @@
+---
+title: "Sstarting Point"
+author: "Blake Guilette"
+date: "2026-10-09"
+output: html_document
+---
+```{r}
+#Blake
+
+```
+
+
+
+```{r}
+#James
+```
+
+
+
+
+
+```{r}
+#Brayden
+```
+
+
+```{r}
+#Riley
+```
+
+
+
+
