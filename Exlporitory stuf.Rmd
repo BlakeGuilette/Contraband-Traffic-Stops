@@ -13,6 +13,9 @@ output: html_document
 
 ```{r}
 #   James
+library(readr)
+CT_stops <- read_csv("data/CT_stops.csv")
+
 ```
 
 
