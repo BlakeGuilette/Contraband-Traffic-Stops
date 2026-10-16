@@ -24,7 +24,10 @@ data.FS <- read.csv("data/private/org_FSStats.xlsx")
 
 
 ```{r}
-#James
+#   James
+library(readr)
+CT_stops <- read_csv("data/CT_stops.csv")
+
 ```
 
 
