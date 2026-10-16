@@ -26,13 +26,16 @@ data.FS <- read.csv("data/private/org_FSStats.xlsx")
 ```{r}
 #   James
 library(readr)
-CT_stops <- read_csv("data/CT_stops.csv")
-CT_prediction_set <- read_csv("data/CT_prediction_set.csv")
+library(tidyverse)
+###CT_stops <- read_csv("data/CT_stops.csv")
+###CT_prediction_set <- read_csv("data/CT_prediction_set.csv")
+
+searched <- CT_stops %>% filter(search_conducted)
+
+ 
 
 #Stop time vs search conducted
-  
 #County vs search conducted
-#police department vs search conducted
 #driver gender vs search conducted
 #driver age vs search conducted
 #driver race vs search conducted
