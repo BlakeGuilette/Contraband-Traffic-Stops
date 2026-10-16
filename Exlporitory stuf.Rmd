@@ -6,6 +6,18 @@ output: html_document
 ---
 ```{r}
 #Blake
+library(tidyverse)
+
+
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(tidyverse)
+
+data.FS <- read.csv("data/private/org_FSStats.xlsx")
+
+
 
 ```
 
