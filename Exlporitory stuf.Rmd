@@ -27,7 +27,18 @@ data.FS <- read.csv("data/private/org_FSStats.xlsx")
 #   James
 library(readr)
 CT_stops <- read_csv("data/CT_stops.csv")
+CT_prediction_set <- read_csv("data/CT_prediction_set.csv")
 
+#Stop time vs search conducted
+  
+#County vs search conducted
+#police department vs search conducted
+#driver gender vs search conducted
+#driver age vs search conducted
+#driver race vs search conducted
+#violation vs search conducted
+#look into officer ID and if a search was conducted
+#Check these variables against on if contraband was found
 ```
 
 
