@@ -24,7 +24,75 @@ library(tidyverse)
 ```{r}
 #   James
 library(readr)
-CT_stops <- read_csv("data/CT_stops.csv")
+library(tidyverse)
+###CT_stops <- read_csv("data/CT_stops.csv")
+###CT_prediction_set <- read_csv("data/CT_prediction_set.csv")
+search_rate_by <- function(data, var) {
+  data %>%
+    filter(!is.na({{ var }}), !is.na(search_conducted)) %>%
+    group_by({{ var }}) %>%
+    summarise(
+      n_stops     = n(),
+      n_searches  = sum(search_conducted),
+      search_rate = mean(search_conducted),
+      .groups = "drop"
+    ) %>%
+    arrange(desc(search_rate))
+}
+
+searched <- CT_stops %>% filter(search_conducted)
+
+ 
+#county_names vs search conducted
+county_search <- CT_stops %>%
+  filter(!is.na(county_name), !is.na(search_conducted)) %>%
+  group_by(county_name) %>%
+  summarise(
+    n_stops     = n(),
+    n_searches  = sum(search_conducted),
+    search_rate = mean(search_conducted)
+  ) %>%
+  arrange(desc(search_rate))
+
+county_search
+
+chisq.test(CT_stops$county_name, CT_stops$search_conducted)
+
+#driver_gender vs search conducted
+
+gender_search <- search_rate_by(CT_stops, driver_gender)
+gender_search
+
+
+#driver_age vs search conducted
+
+age_search <- CT_stops %>%
+  filter(!is.na(driver_age), !is.na(search_conducted)) %>%
+  mutate(age_group = cut(driver_age,
+                         breaks = c(15, 20, 25, 30, 40, 50, 60, 100),
+                         right = FALSE)) %>%
+  group_by(age_group) %>%
+  summarise(n_stops = n(),
+            search_rate = mean(search_conducted))
+
+age_search
+
+#driver_race vs search conducted
+
+race_search <- search_rate_by(CT_stops, driver_race)
+race_search
+
+chisq.test(CT_stops$driver_race, CT_stops$search_conducted)
+
+#violation vs search conducted
+
+violation_search <- search_rate_by(CT_stops, violation)
+
+
+chisq.test(CT_stops$violation, CT_stops$search_conducted)
+
+#Check these variables against on if contraband was found
+
 
 ```
 
