@@ -1,0 +1,125 @@
+---
+title: "BlakeExplore"
+output: html_document
+---
+
+```{r}
+
+
+#CT_stops <- read.csv("C:/Users/Blake/Desktop/Stat 443/Midterm/Contraband-Traffic-Stops/data/CT_stops.csv")
+
+
+
+CT_clean <- CT_stops %>%
+  select(
+    -driver_age_raw,
+    -driver_race_raw,
+    -violation_raw,
+    -search_type_raw,
+    -state,
+    -stop_date,
+    -fine_grained_location,
+    -police_department,
+    -location_raw,
+    -stop_outcome,
+    -is_arrested,
+  )
+names(CT_clean)
+View(CT_clean)
+
+```
+
+```{r}
+#Changing age into baskets
+library(dplyr)
+library(ggplot2)
+CT_clean <- CT_clean %>%
+  mutate(
+    driver_age_group = cut(
+      driver_age,
+      breaks = c(14, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 150),
+      labels = c(
+        "15-20", "21-25", "26-30", "31-35", "36-40",
+        "41-45", "46-50", "51-55", "56-60", "61-65", "66+"
+      ),
+      right = TRUE
+    )
+  )
+
+ggplot(
+  CT_clean,
+  aes(x = factor(
+    driver_age_group,
+    levels = c(
+      "15-20", "21-25", "26-30", "31-35", "36-40",
+      "41-45", "46-50", "51-55", "56-60", "61-65", "66+"
+    )
+  ))
+) +
+  geom_bar(fill = "steelblue", color = "white") +
+  labs(
+    title = "Distribution of Driver Age Groups",
+    x = "Driver Age Group",
+    y = "Number of Stops"
+  ) +
+  theme_minimal()
+
+
+
+
+
+```
+```{r}
+CT_clean <- CT_clean %>%
+  mutate(
+    across(
+      c(
+        driver_race,
+        violation,
+        search_conducted,
+        search_type,
+        contraband_found,
+        driver_gender,
+        county_name,
+        stop_duration
+      ),
+      as.factor
+    )
+  )
+
+# Check the updated column types
+str(CT_clean)
+
+
+```
+```{r}
+# Keep only stops where a search was conducted
+CT_searches <- CT_clean %>%
+  filter(search_conducted == "TRUE")
+
+
+CT_searches %>%
+  summarise(
+    rows_remaining = n(),
+    contraband_count = sum(contraband_found == "TRUE", na.rm = TRUE),
+    fraction_contraband = mean(contraband_found == "TRUE", na.rm = TRUE)
+  )
+
+```
+```{r}
+
+
+# Count and calculate the percentage missing for every variable
+missing_summary <- data.frame(
+  variable = names(CT_clean),
+  missing_count = colSums(is.na(CT_clean)),
+  percent_missing = round(
+    colMeans(is.na(CT_clean)) * 100, 2
+  )
+) %>%
+  arrange(desc(percent_missing))
+
+missing_summary
+
+```
+
