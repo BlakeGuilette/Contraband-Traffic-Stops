@@ -15,8 +15,6 @@ library(ggplot2)
 library(scales)
 library(tidyverse)
 
-data.FS <- read.csv("data/private/org_FSStats.xlsx")
-
 
 
 ```
