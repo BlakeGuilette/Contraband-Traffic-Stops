@@ -43,28 +43,24 @@ search_rate_by <- function(data, var) {
 searched <- CT_stops %>% filter(contraband_found)
 
  
-#county_names vs search conducted
-county_search <- CT_stops %>%
-  filter(!is.na(county_name), !is.na(contraband_found)) %>%
-  group_by(county_name) %>%
-  summarise(
-    n_stops     = n(),
-    n_contraband  = sum(contraband_found),
-    contraband_proportion = mean(contraband_found)
-  ) %>%
-  arrange(desc(contraband_proportion))
-
+#county_name vs contraband
+county_search <- search_rate_by(CT_stops, county_name)
 county_search
 
 chisq.test(CT_stops$county_name, CT_stops$contraband_found)
 
-#driver_gender vs search conducted
+county_name <- factor(CT_stops$county_name)
+lr <- glm(contraband_found ~ county_name, family=binomial, data = CT_stops)
+summary(lr)
+#driver_gender vs contraband
 
 gender_search <- search_rate_by(CT_stops, driver_gender)
 gender_search
 
-
-#driver_age vs search conducted
+driver_gender <- factor(CT_stops$driver_gender)
+lr <- glm(contraband_found ~ driver_gender, family=binomial, data = CT_stops)
+summary(lr)
+#driver_age vs contraband
 
 age_search <- CT_stops %>%
   filter(!is.na(driver_age), !is.na(contraband_found)) %>%
@@ -77,22 +73,27 @@ age_search <- CT_stops %>%
 
 age_search
 
-#driver_race vs search conducted
+#driver_race vs contraband
 
 race_search <- search_rate_by(CT_stops, driver_race)
 race_search
 
 chisq.test(CT_stops$driver_race, CT_stops$contraband_found)
 
-#violation vs search conducted
+driver_race <- factor(CT_stops$driver_race)
+lr <- glm(contraband_found ~ driver_race, family=binomial, data = CT_stops)
+summary(lr)
+
+#violation vs contraband
 
 violation_search <- search_rate_by(CT_stops, violation)
 violation_search
 
 chisq.test(CT_stops$violation, CT_stops$contraband_found)
 
-#Check these variables against on if contraband was found
-
+violation <- factor(CT_stops$violation)
+lr <- glm(contraband_found ~ violation, family=binomial, data = CT_stops)
+summary(lr)
 
 ```
 
