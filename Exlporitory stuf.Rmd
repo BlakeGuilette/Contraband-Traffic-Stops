@@ -29,34 +29,34 @@ library(tidyverse)
 ###CT_prediction_set <- read_csv("data/CT_prediction_set.csv")
 search_rate_by <- function(data, var) {
   data %>%
-    filter(!is.na({{ var }}), !is.na(search_conducted)) %>%
+    filter(!is.na({{ var }}), !is.na(contraband_found)) %>%
     group_by({{ var }}) %>%
     summarise(
       n_stops     = n(),
-      n_searches  = sum(search_conducted),
-      search_rate = mean(search_conducted),
+      n_contraband  = sum(contraband_found),
+      contraband_proportion = mean(contraband_found),
       .groups = "drop"
     ) %>%
-    arrange(desc(search_rate))
+    arrange(desc(contraband_proportion))
 }
 
-searched <- CT_stops %>% filter(search_conducted)
+searched <- CT_stops %>% filter(contraband_found)
 
  
 #county_names vs search conducted
 county_search <- CT_stops %>%
-  filter(!is.na(county_name), !is.na(search_conducted)) %>%
+  filter(!is.na(county_name), !is.na(contraband_found)) %>%
   group_by(county_name) %>%
   summarise(
     n_stops     = n(),
-    n_searches  = sum(search_conducted),
-    search_rate = mean(search_conducted)
+    n_contraband  = sum(contraband_found),
+    contraband_proportion = mean(contraband_found)
   ) %>%
-  arrange(desc(search_rate))
+  arrange(desc(contraband_proportion))
 
 county_search
 
-chisq.test(CT_stops$county_name, CT_stops$search_conducted)
+chisq.test(CT_stops$county_name, CT_stops$contraband_found)
 
 #driver_gender vs search conducted
 
@@ -67,13 +67,13 @@ gender_search
 #driver_age vs search conducted
 
 age_search <- CT_stops %>%
-  filter(!is.na(driver_age), !is.na(search_conducted)) %>%
+  filter(!is.na(driver_age), !is.na(contraband_found)) %>%
   mutate(age_group = cut(driver_age,
                          breaks = c(15, 20, 25, 30, 40, 50, 60, 100),
                          right = FALSE)) %>%
   group_by(age_group) %>%
   summarise(n_stops = n(),
-            search_rate = mean(search_conducted))
+            search_rate = mean(contraband_found))
 
 age_search
 
@@ -82,14 +82,14 @@ age_search
 race_search <- search_rate_by(CT_stops, driver_race)
 race_search
 
-chisq.test(CT_stops$driver_race, CT_stops$search_conducted)
+chisq.test(CT_stops$driver_race, CT_stops$contraband_found)
 
 #violation vs search conducted
 
 violation_search <- search_rate_by(CT_stops, violation)
+violation_search
 
-
-chisq.test(CT_stops$violation, CT_stops$search_conducted)
+chisq.test(CT_stops$violation, CT_stops$contraband_found)
 
 #Check these variables against on if contraband was found
 
