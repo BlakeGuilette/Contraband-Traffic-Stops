@@ -25,6 +25,7 @@ library(tidyverse)
 #   James
 library(readr)
 library(tidyverse)
+library(multcomp)
 ###CT_stops <- read_csv("data/CT_stops.csv")
 ###CT_prediction_set <- read_csv("data/CT_prediction_set.csv")
 search_rate_by <- function(data, var) {
@@ -49,17 +50,23 @@ county_search
 
 chisq.test(CT_stops$county_name, CT_stops$contraband_found)
 
-county_name <- factor(CT_stops$county_name)
+CT_stops$county_name <- factor(CT_stops$county_name)
 lr <- glm(contraband_found ~ county_name, family=binomial, data = CT_stops)
 summary(lr)
+
+summary(glht(lr, mcp(county_name="Tukey")))
+
 #driver_gender vs contraband
 
 gender_search <- search_rate_by(CT_stops, driver_gender)
 gender_search
 
-driver_gender <- factor(CT_stops$driver_gender)
+CT_stops$driver_gender <- factor(CT_stops$driver_gender)
 lr <- glm(contraband_found ~ driver_gender, family=binomial, data = CT_stops)
 summary(lr)
+
+summary(glht(lr, mcp(driver_gender="Tukey")))
+
 #driver_age vs contraband
 
 age_search <- CT_stops %>%
@@ -80,9 +87,12 @@ race_search
 
 chisq.test(CT_stops$driver_race, CT_stops$contraband_found)
 
-driver_race <- factor(CT_stops$driver_race)
+CT_stops$driver_race <- factor(CT_stops$driver_race)
 lr <- glm(contraband_found ~ driver_race, family=binomial, data = CT_stops)
 summary(lr)
+
+summary(glht(lr, mcp(driver_race="Tukey")))
+
 
 #violation vs contraband
 
@@ -91,9 +101,9 @@ violation_search
 
 chisq.test(CT_stops$violation, CT_stops$contraband_found)
 
-violation <- factor(CT_stops$violation)
-lr <- glm(contraband_found ~ violation, family=binomial, data = CT_stops)
-summary(lr)
+###violation <- factor(CT_stops$violation)
+###lr <- glm(contraband_found ~ violation, family=binomial, data = CT_stops)
+###summary(lr)
 
 ```
 
