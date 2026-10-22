@@ -4,7 +4,8 @@ output: html_document
 ---
 
 ```{r}
-
+library(readr)
+library(tidyverse)
 
 #CT_stops <- read.csv("C:/Users/Blake/Desktop/Stat 443/Midterm/Contraband-Traffic-Stops/data/CT_stops.csv")
 
@@ -70,6 +71,51 @@ ggplot(
 
 ```
 ```{r}
+
+
+
+
+
+
+CT_clean <- CT_clean %>%
+  mutate(
+    violation_group = case_when(
+      is.na(violation) ~ NA_character_,
+
+      # Keep combinations separate
+      grepl(",", violation) ~ "Multiple violations",
+
+      violation == "Speeding" ~ "Speeding",
+
+      violation %in% c(
+        "Moving violation", "Stop sign/light", "Safe movement"
+      ) ~ "Other moving violations",
+
+      violation %in% c(
+        "Registration/plates", "License"
+      ) ~ "Registration/license",
+
+      violation %in% c(
+        "Equipment", "Lights"
+      ) ~ "Equipment/lights",
+
+      violation %in% c(
+        "Cell phone", "Seat belt"
+      ) ~ "Cell phone/seat belt",
+
+      TRUE ~ "Other"
+    ),
+    violation_group = factor(violation_group)
+  )
+
+# Check the groups and their counts
+CT_clean %>%
+  count(violation_group, sort = TRUE)
+
+
+
+
+
 CT_clean <- CT_clean %>%
   mutate(
     across(
@@ -81,7 +127,8 @@ CT_clean <- CT_clean %>%
         contraband_found,
         driver_gender,
         county_name,
-        stop_duration
+        stop_duration,
+        violation_group
       ),
       as.factor
     )
@@ -91,7 +138,13 @@ CT_clean <- CT_clean %>%
 str(CT_clean)
 
 
+write.csv(CT_clean, "CT_clean.csv", row.names = FALSE)
 ```
+For cleaning the data we:
+Got rid of the raw data
+Factor the different components that needed to be factored quantitative predictors
+reduced the 118 violation levels to seven broader categories. Similar single violations were grouped together while stops listing multiple violations were assigned to a separate category to avoid arbitrarily selecting one violation 
+
 ```{r}
 # Keep only stops where a search was conducted
 CT_searches <- CT_clean %>%
@@ -105,7 +158,22 @@ CT_searches %>%
     fraction_contraband = mean(contraband_found == "TRUE", na.rm = TRUE)
   )
 
+# Count and calculate the percentage missing for every variable
+missing_summary_searches <- data.frame(
+  variable = names(CT_searches),
+  missing_count = colSums(is.na(CT_searches)),
+  percent_missing = round(
+    colMeans(is.na(CT_searches)) * 100, 2
+  )
+) %>%
+  arrange(desc(percent_missing))
+
+missing_summary_searches
+view(CT_searches)
+
+write.csv(CT_searches, "CT_searches.csv", row.names = FALSE)
 ```
+
 ```{r}
 
 
@@ -122,4 +190,6 @@ missing_summary <- data.frame(
 missing_summary
 
 ```
+
+
 
