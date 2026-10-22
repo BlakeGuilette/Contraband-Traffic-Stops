@@ -192,4 +192,16 @@ missing_summary
 ```
 
 
+```{r}
+chisq.test(CT_searches$driver_race, CT_searches$contraband_found)
+
+chisq.test(CT_searches$county_name, CT_searches$contraband_found)
+
+chisq.test(CT_searches$driver_gender,CT_searches$contraband_found)
+
+chisq.test(CT_searches$driver_age_group,CT_searches$contraband_found)
+
+chisq.test(CT_searches$violation_group,CT_searches$contraband_found)
+
+```
 
