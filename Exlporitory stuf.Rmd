@@ -23,14 +23,18 @@ library(tidyverse)
 
 ```{r}
 #   James
+
 library(readr)
 library(tidyverse)
 library(multcomp)
-###CT_stops <- read_csv("data/CT_stops.csv")
-###CT_prediction_set <- read_csv("data/CT_prediction_set.csv")
+
+CT_clean <- read.csv("CT_clean.csv")
+CT_clean <- CT_clean %>% 
+  filter(!is.na(county_name), !is.na(driver_age), !is.na(driver_age_group))
+#Gets rid of missing data
+
 search_rate_by <- function(data, var) {
   data %>%
-    filter(!is.na({{ var }}), !is.na(contraband_found)) %>%
     group_by({{ var }}) %>%
     summarise(
       n_stops     = n(),
@@ -40,70 +44,65 @@ search_rate_by <- function(data, var) {
     ) %>%
     arrange(desc(contraband_proportion))
 }
-
-searched <- CT_stops %>% filter(contraband_found)
+#function to find proportion of contraband for any variable
 
  
 #county_name vs contraband
-county_search <- search_rate_by(CT_stops, county_name)
-county_search
 
-chisq.test(CT_stops$county_name, CT_stops$contraband_found)
+county_search <- search_rate_by(CT_clean, county_name)
+county_search #Based off first look there appears to be difference in proportion.
 
-CT_stops$county_name <- factor(CT_stops$county_name)
-lr <- glm(contraband_found ~ county_name, family=binomial, data = CT_stops)
-summary(lr)
+chisq.test(CT_clean$county_name, CT_clean$contraband_found)
+#Chisq test find sifficent evidence of difference in proportion
 
-summary(glht(lr, mcp(county_name="Tukey")))
+CT_clean$county_name <- factor(CT_clean$county_name)
+lr <- glm(contraband_found ~ county_name, family=binomial, data = CT_clean)
+summary(lr) #Model shows significant affect from Litchfield, Middlesex, and Tolland County.
 
 #driver_gender vs contraband
 
-gender_search <- search_rate_by(CT_stops, driver_gender)
-gender_search
+gender_search <- search_rate_by(CT_clean, driver_gender)
+gender_search #First look there apperas to be a lrage difference in proportions
 
-CT_stops$driver_gender <- factor(CT_stops$driver_gender)
-lr <- glm(contraband_found ~ driver_gender, family=binomial, data = CT_stops)
-summary(lr)
-
-summary(glht(lr, mcp(driver_gender="Tukey")))
+CT_clean$driver_gender <- factor(CT_clean$driver_gender)
+lr <- glm(contraband_found ~ driver_gender, family=binomial, data = CT_clean)
+summary(lr) #significant affect from both Male and Female
 
 #driver_age vs contraband
 
-age_search <- CT_stops %>%
-  filter(!is.na(driver_age), !is.na(contraband_found)) %>%
-  mutate(age_group = cut(driver_age,
-                         breaks = c(15, 20, 25, 30, 40, 50, 60, 100),
-                         right = FALSE)) %>%
-  group_by(age_group) %>%
-  summarise(n_stops = n(),
-            search_rate = mean(contraband_found))
+age_search <- search_rate_by(CT_clean, driver_age_group)
+age_search #First look, there appears to be a difference based on age
 
-age_search
+chisq.test(CT_clean$driver_age_group, CT_clean$contraband_found)
+#Chi squared test concludes that there is sufficient evidence that at least one proption is different
+
+CT_clean$driver_age_group <- factor(CT_clean$driver_age_group)
+lr <- glm(contraband_found ~ driver_age_group, family=binomial, data = CT_clean)
+summary(lr) #Test shows a significant affect in all groups.
 
 #driver_race vs contraband
 
-race_search <- search_rate_by(CT_stops, driver_race)
-race_search
+race_search <- search_rate_by(CT_clean, driver_race)
+race_search #Fist look there appears to be difference based on gender
 
-chisq.test(CT_stops$driver_race, CT_stops$contraband_found)
+chisq.test(CT_clean$driver_race, CT_clean$contraband_found)
+#Chi squared test concludes that there is sufficient evidence that at least one proption is different
 
-CT_stops$driver_race <- factor(CT_stops$driver_race)
-lr <- glm(contraband_found ~ driver_race, family=binomial, data = CT_stops)
-summary(lr)
-
-summary(glht(lr, mcp(driver_race="Tukey")))
-
+CT_clean$driver_race <- factor(CT_clean$driver_race)
+lr <- glm(contraband_found ~ driver_race, family=binomial, data = CT_clean)
+summary(lr) #There is a significant affect for Black, White, Hispanic and Asian.
 
 #violation vs contraband
 
-violation_search <- search_rate_by(CT_stops, violation)
-violation_search
+violation_search <- search_rate_by(CT_clean, violation_group)
+violation_search #First look, there appears to be a difference based on violation
 
-chisq.test(CT_stops$violation, CT_stops$contraband_found)
+chisq.test(CT_clean$violation_group, CT_clean$contraband_found)
+#Chi squared test concludes that there is sufficient evidence that at least one proption is different
 
-###violation <- factor(CT_stops$violation)
-###lr <- glm(contraband_found ~ violation, family=binomial, data = CT_stops)
-###summary(lr)
+violation_group <- factor(CT_clean$violation_group)
+lr <- glm(contraband_found ~ violation_group, family=binomial, data = CT_clean)
+summary(lr) #Shows significant affect for all groups other than speeding
 
 ```
 
