@@ -116,7 +116,105 @@ summary(lr) #Shows significant affect for all groups other than speeding
 
 
 ```{r}
-#Riley
+
+library(tidyverse)
+
+CT_searches <- read.csv("CT_searches.csv")
+
+# Bargraph showing relationship between gender and contraband found in searches
+CT_searches %>%
+  group_by(driver_gender) %>%
+  summarise(
+    contraband_rate = mean(contraband_found, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  ggplot(aes(x = driver_gender, y = contraband_rate)) +
+  geom_col(fill = "steelblue") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Contraband Discovery Rate by Gender",
+    x = "Driver Gender",
+    y = "Percentage of Searches Finding Contraband"
+  ) +
+  theme_minimal()
+
+# Boxplots showing relationship between age and contraband found in searches
+ggplot(CT_searches,
+       aes(x = factor(contraband_found),
+           y = driver_age)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(
+    title = "Driver Age vs. Contraband Found",
+    x = "Contraband Found",
+    y = "Driver Age"
+  ) +
+  theme_minimal()
+
+# Number of searches that occurred in each racial group
+# Checks for reliable data
+CT_searches %>%
+  group_by(driver_race) %>%
+  summarise(
+    total_searches = n(),
+    contraband_found = sum(contraband_found, na.rm = TRUE),
+    discovery_rate = mean(contraband_found, na.rm = TRUE)
+  )
+
+# Bargraph showing relationship between race and contraband found in searches
+CT_searches %>%
+  group_by(driver_race) %>%
+  summarise(
+    contraband_rate = mean(contraband_found, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  ggplot(aes(x = driver_race, y = contraband_rate)) +
+  geom_col(fill = "steelblue") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Contraband Discovery Rate by Race",
+    x = "Driver Race",
+    y = "Percentage of Searches Finding Contraband"
+  ) +
+  theme_minimal()
+
+# Bargraph showing relationship between violation type and contraband found in searches
+CT_searches %>%
+  group_by(violation_group) %>%
+  summarise(
+    contraband_rate = mean(contraband_found, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  ggplot(aes(x = reorder(violation_group, -contraband_rate),
+             y = contraband_rate)) +
+  geom_col(fill = "steelblue") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Contraband Discovery Rate by Violation Type",
+    x = "Violation Type",
+    y = "Percentage of Searches Finding Contraband"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Horizontral bargraph showing relationship between county and contraband found in searches
+CT_searches %>%
+  group_by(county_name) %>%
+  summarise(
+    contraband_rate = mean(contraband_found, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  ggplot(aes(x = reorder(county_name, contraband_rate),
+             y = contraband_rate)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Contraband Discovery Rate by County",
+    x = "County",
+    y = "Percentage of Searches Finding Contraband"
+  ) +
+  theme_minimal()
+
 ```
 
 
